@@ -2,25 +2,29 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <!-- Meta Tag สำคัญที่ทำให้เว็บเป็น Mobile Friendly เต็มจอ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Café App</title>
     
-    <!-- Tailwind CSS -->
+    <!-- เรียกใช้ Tailwind CSS (แต่งสวยสำเร็จรูป) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Icon -->
+    
+    <!-- เรียกใช้ Font Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Font -->
+    
+    <!-- เรียกใช้ฟอนต์ Kanit สวยๆ -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
         body { font-family: 'Kanit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* ซ่อน Scrollbar ตอนโหลด */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen pb-10">
 
-    <!-- Header -->
+    <!-- Header ด้านบน (Sticky) -->
     <div class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-md md:max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -30,7 +34,7 @@
                 My Café
             </h1>
             
-            <!-- เมนูสำหรับ Desktop -->
+            <!-- เมนูสำหรับ Desktop (จะซ่อนเมื่ออยู่บนมือถือ) -->
             <div class="hidden md:flex gap-6 text-gray-500 text-sm font-medium">
                 <a href="#" class="hover:text-amber-500 transition">หน้าหลัก</a>
                 <a href="#" class="hover:text-amber-500 transition">เมนูทั้งหมด</a>
@@ -43,7 +47,7 @@
         </div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Container (ปรับขนาดตามหน้าจออัตโนมัติ) -->
     <div class="max-w-md md:max-w-6xl mx-auto px-4 mt-6">
 
         <!-- Grid Layout: มือถือ 1 ช่อง / คอมพิวเตอร์ 12 ช่อง -->
@@ -52,16 +56,19 @@
             <!-- ส่วนที่ 1: ฟอร์มสั่งของ (ซ้าย) -->
             <div class="md:col-span-4 lg:col-span-4 sticky top-24">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
+                    <!-- ลวดลายตกแต่ง -->
                     <div class="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
 
                     <h2 class="text-lg font-bold text-gray-800 mb-4 relative z-10">สั่งออเดอร์ใหม่</h2>
                     
                     <div class="space-y-4 relative z-10">
+                        <!-- Dropdown เลือกเมนู -->
                         <div>
                             <label class="text-xs text-gray-400 ml-1 mb-1 block">เลือกเมนู</label>
                             <div class="relative">
                                 <select id="menu-selector" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all cursor-pointer">
                                     <option value="" disabled selected>แตะเพื่อเลือกเครื่องดื่ม...</option>
+                                    <!-- ตัวเลือกจะถูกสร้างด้วย JS -->
                                 </select>
                                 <div class="absolute left-3 top-3.5 text-gray-400">
                                     <i class="fa-solid fa-martini-glass-citrus"></i>
@@ -72,11 +79,13 @@
                             </div>
                         </div>
 
+                        <!-- แสดงราคา -->
                         <div class="flex justify-between items-center bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100">
                             <span class="text-gray-600 font-medium">ราคาต่อแก้ว</span>
                             <span id="price-display" class="text-2xl font-bold text-amber-600">0 ฿</span>
                         </div>
 
+                        <!-- ปุ่มเพิ่ม -->
                         <button onclick="addProduct()" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl hover:bg-gray-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <i class="fa-solid fa-plus-circle"></i>
                             บันทึกรายการ
@@ -91,193 +100,4 @@
                     <h3 class="text-gray-800 font-bold text-lg flex items-center gap-2">
                         <i class="fa-solid fa-list-ul text-amber-500"></i> รายการล่าสุด
                     </h3>
-                    <button onclick="loadProducts()" class="text-gray-400 hover:text-amber-500 transition bg-white p-2 rounded-lg shadow-sm border border-gray-100">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </button>
-                </div>
-
-                <div id="loading" class="hidden py-12 text-center">
-                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-amber-500"></div>
-                    <p class="text-gray-400 text-sm mt-3">กำลังโหลด...</p>
-                </div>
-
-                <!-- Grid รายการสินค้า: มือถือ 1 แถว / คอมพิวเตอร์ 2 แถว -->
-                <ul id="product-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-20">
-                    <!-- JS จะมาสร้างรายการตรงนี้ -->
-                </ul>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ใส่ Script ไว้ในนี้เลย ทำงานชัวร์ 100% -->
-    <script>
-        // --- ตั้งค่า ---
-        const BASE_URL = 'https://my-api-server-jr7.onrender.com(https://my-api-server-jr7.onrender.com)';
-
-    
-        const MENU_ITEMS = [
-            { name: "Iced Americano", price: 60, icon: "☕" },
-            { name: "Iced Latte", price: 70, icon: "🥛" },
-            { name: "Cappuccino", price: 75, icon: "🥯" },
-            { name: "Caramel Macchiato", price: 85, icon: "🍯" },
-            { name: "Green Tea Latte", price: 65, icon: "🍵" },
-            { name: "Thai Tea", price: 55, icon: "🧡" },
-            { name: "Peach Tea", price: 60, icon: "🍑" },
-            { name: "Cocoa Rich", price: 65, icon: "🍫" },
-            { name: "Strawberry Soda", price: 50, icon: "🍓" },
-            { name: "Blueberry Cheesecake", price: 120, icon: "🍰" }
-        ];
-
-        const IMAGES = {
-            "Coffee": "[https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=500&q=80](https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=500&q=80)",
-            "Tea": "[https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=500&q=80](https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=500&q=80)",
-            "Choco": "[https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&q=80](https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&q=80)",
-            "Soda": "[https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80](https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80)",
-            "Cake": "[https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500&q=80](https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500&q=80)",
-            "Default": "[https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80](https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80)"
-        };
-
-        // เริ่มทำงาน
-        initMenu();
-        loadProducts();
-
-        // --- Functions ---
-
-        function initMenu() {
-            const selector = document.getElementById('menu-selector');
-            const priceDisplay = document.getElementById('price-display');
-
-            // เคลียร์ของเก่าก่อนกันเหนียว
-            selector.innerHTML = '<option value="" disabled selected>แตะเพื่อเลือกเครื่องดื่ม...</option>';
-
-            MENU_ITEMS.forEach(item => {
-                const option = document.createElement('option');
-                option.value = JSON.stringify(item);
-                option.textContent = `${item.icon} ${item.name}`;
-                selector.appendChild(option);
-            });
-
-            selector.addEventListener('change', (e) => {
-                try {
-                    const selectedItem = JSON.parse(e.target.value);
-                    priceDisplay.textContent = `${selectedItem.price} ฿`;
-                } catch (err) {
-                    console.error("เลือกเมนูผิดพลาด", err);
-                }
-            });
-        }
-
-        function getImageFromName(name) {
-            if(!name) return IMAGES.Default;
-            const lower = name.toLowerCase();
-            if (lower.includes("tea") || lower.includes("cha")) return IMAGES.Tea;
-            if (lower.includes("choco") || lower.includes("cocoa")) return IMAGES.Choco;
-            if (lower.includes("soda")) return IMAGES.Soda;
-            if (lower.includes("cake") || lower.includes("cheese")) return IMAGES.Cake;
-            if (lower.includes("coffee") || lower.includes("latte") || lower.includes("americano")) return IMAGES.Coffee;
-            return IMAGES.Default;
-        }
-
-        async function loadProducts() {
-            const loader = document.getElementById('loading');
-            const list = document.getElementById('product-list');
-            
-            if(loader) loader.style.display = 'block';
-            if(list) list.innerHTML = '';
-
-            try {
-                const response = await fetch(`${BASE_URL}/api/products`);
-                if (!response.ok) throw new Error("Server ไม่ตอบสนอง");
-                
-                const data = await response.json();
-                
-                if(loader) loader.style.display = 'none';
-
-                if (data.length === 0) {
-                    list.innerHTML = `<div class="col-span-1 sm:col-span-2 text-center py-10 opacity-50"><p>ยังไม่มีรายการวันนี้</p></div>`;
-                    return;
-                }
-
-                data.forEach((item) => {
-                    const imageUrl = getImageFromName(item.name);
-                    const li = document.createElement('li');
-                    
-                    li.className = "bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-all duration-300";
-                    
-                    li.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <img src="${imageUrl}" class="w-14 h-14 rounded-xl object-cover shadow-sm">
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm mb-1">${item.name}</h4>
-                                <span class="text-amber-600 font-bold text-sm bg-amber-50 px-2 py-0.5 rounded-md">${item.price} ฿</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1 pl-2">
-                            <button onclick="updateProduct('${item._id}', '${item.name}', ${item.price})" class="w-9 h-9 rounded-full text-gray-400 hover:bg-amber-50 hover:text-amber-600 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
-                            <button onclick="deleteProduct('${item._id}')" class="w-9 h-9 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition"><i class="fa-solid fa-trash text-xs"></i></button>
-                        </div>
-                    `;
-                    list.appendChild(li);
-                });
-
-            } catch (error) {
-                console.error(error);
-                if(loader) loader.innerHTML = '<p class="text-red-500 text-sm">เชื่อมต่อ Server ไม่ได้</p>';
-            }
-        }
-
-        async function addProduct() {
-            const selector = document.getElementById('menu-selector');
-            if (!selector.value) {
-                selector.classList.add('ring-2', 'ring-red-400');
-                setTimeout(() => selector.classList.remove('ring-2', 'ring-red-400'), 500);
-                return;
-            }
-
-            const selectedItem = JSON.parse(selector.value);
-            const btn = document.querySelector('button[onclick="addProduct()"]');
-            
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-            btn.disabled = true;
-
-            try {
-                await fetch(`${BASE_URL}/api/products`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: selectedItem.name, price: selectedItem.price })
-                });
-                
-                loadProducts();
-                selector.value = "";
-                document.getElementById('price-display').textContent = "0 ฿";
-
-            } catch (error) {
-                alert("เกิดข้อผิดพลาด");
-            } finally {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            }
-        }
-
-        async function deleteProduct(id) {
-            if(!confirm("ลบรายการนี้?")) return;
-            await fetch(`${BASE_URL}/api/products/${id}`, { method: 'DELETE' });
-            loadProducts();
-        }
-
-        async function updateProduct(id, oldName, oldPrice) {
-            const newPrice = prompt(`แก้ไขราคา ${oldName}:`, oldPrice);
-            if (newPrice === null || newPrice === "") return;
-
-            await fetch(`${BASE_URL}/api/products/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: oldName, price: parseInt(newPrice) })
-            });
-            loadProducts();
-        }
-    </script>
-</body>
-</html>
+                    <button onclick="

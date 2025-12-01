@@ -1,6 +1,8 @@
 // --- ตั้งค่า ---
+// ลิงก์ Server ของคุณ (Render)
 const BASE_URL = 'https://my-api-server-jr7.onrender.com';
 
+// ข้อมูลเมนู (Mock Data สำหรับ Dropdown)
 const MENU_ITEMS = [
     { name: "Iced Americano", price: 60, icon: "☕", category: "Coffee" },
     { name: "Iced Latte", price: 70, icon: "🥛", category: "Coffee" },
@@ -14,6 +16,7 @@ const MENU_ITEMS = [
     { name: "Blueberry Cheesecake", price: 120, icon: "🍰", category: "Cake" }
 ];
 
+// รูปภาพสวยๆ จาก Unsplash
 const IMAGES = {
     "Coffee": "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=500&q=80",
     "Tea": "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=500&q=80",
@@ -23,39 +26,44 @@ const IMAGES = {
     "Default": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80"
 };
 
-// เริ่มทำงาน
+// --- เริ่มต้นทำงาน ---
 initMenu();
 loadProducts();
 
-// --- Functions ---
+// --- ฟังก์ชันต่างๆ ---
 
+// 1. ฟังก์ชันสร้าง Dropdown
 function initMenu() {
     const selector = document.getElementById('menu-selector');
     const priceDisplay = document.getElementById('price-display');
 
+    // วนลูปสร้างตัวเลือก
     MENU_ITEMS.forEach(item => {
         const option = document.createElement('option');
-        option.value = JSON.stringify(item);
+        option.value = JSON.stringify(item); 
         option.textContent = `${item.icon} ${item.name}`;
         selector.appendChild(option);
     });
 
+    // เมื่อเลือกเปลี่ยนราคา
     selector.addEventListener('change', (e) => {
         const selectedItem = JSON.parse(e.target.value);
         priceDisplay.textContent = `${selectedItem.price} ฿`;
     });
 }
 
+// 2. ฟังก์ชันเดารูปภาพ
 function getImageFromName(name) {
-    const lower = name.toLowerCase();
-    if (lower.includes("tea") || lower.includes("cha")) return IMAGES.Tea;
-    if (lower.includes("choco") || lower.includes("cocoa")) return IMAGES.Choco;
-    if (lower.includes("soda")) return IMAGES.Soda;
-    if (lower.includes("cake") || lower.includes("cheese")) return IMAGES.Cake;
-    if (lower.includes("coffee") || lower.includes("latte") || lower.includes("americano")) return IMAGES.Coffee;
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes("tea") || lowerName.includes("cha")) return IMAGES.Tea;
+    if (lowerName.includes("choco") || lowerName.includes("cocoa")) return IMAGES.Choco;
+    if (lowerName.includes("soda")) return IMAGES.Soda;
+    if (lowerName.includes("cake") || lowerName.includes("cheese")) return IMAGES.Cake;
+    if (lowerName.includes("coffee") || lowerName.includes("latte") || lowerName.includes("americano")) return IMAGES.Coffee;
     return IMAGES.Default;
 }
 
+// 3. โหลดสินค้า (GET)
 async function loadProducts() {
     const loader = document.getElementById('loading');
     const list = document.getElementById('product-list');
@@ -83,6 +91,7 @@ async function loadProducts() {
             const imageUrl = getImageFromName(item.name);
             const li = document.createElement('li');
             
+            // สร้าง Card แบบสวยๆ (Responsive)
             li.className = "bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-all duration-300";
             
             li.innerHTML = `
@@ -94,67 +103,5 @@ async function loadProducts() {
                     </div>
                 </div>
                 <div class="flex gap-1 pl-2">
-                    <button onclick="updateProduct('${item._id}', '${item.name}', ${item.price})" class="w-9 h-9 rounded-full text-gray-400 hover:bg-amber-50 hover:text-amber-600 flex items-center justify-center transition"><i class="fa-solid fa-pen text-xs"></i></button>
-                    <button onclick="deleteProduct('${item._id}')" class="w-9 h-9 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition"><i class="fa-solid fa-trash text-xs"></i></button>
-                </div>
-            `;
-            list.appendChild(li);
-        });
-
-    } catch (error) {
-        console.error(error);
-        loader.innerHTML = '<p class="text-red-500 text-sm">เชื่อมต่อ Server ไม่ได้</p>';
-    }
-}
-
-async function addProduct() {
-    const selector = document.getElementById('menu-selector');
-    if (!selector.value) {
-        selector.classList.add('ring-2', 'ring-red-400');
-        setTimeout(() => selector.classList.remove('ring-2', 'ring-red-400'), 500);
-        return;
-    }
-
-    const selectedItem = JSON.parse(selector.value);
-    const btn = document.querySelector('button[onclick="addProduct()"]');
-    
-    const originalContent = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-    btn.disabled = true;
-
-    try {
-        await fetch(`${BASE_URL}/api/products`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: selectedItem.name, price: selectedItem.price })
-        });
-        
-        loadProducts();
-        selector.value = "";
-        document.getElementById('price-display').textContent = "0 ฿";
-
-    } catch (error) {
-        alert("เกิดข้อผิดพลาด");
-    } finally {
-        btn.innerHTML = originalContent;
-        btn.disabled = false;
-    }
-}
-
-async function deleteProduct(id) {
-    if(!confirm("ลบรายการนี้?")) return;
-    await fetch(`${BASE_URL}/api/products/${id}`, { method: 'DELETE' });
-    loadProducts();
-}
-
-async function updateProduct(id, oldName, oldPrice) {
-    const newPrice = prompt(`แก้ไขราคา ${oldName}:`, oldPrice);
-    if (newPrice === null || newPrice === "") return;
-
-    await fetch(`${BASE_URL}/api/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: oldName, price: parseInt(newPrice) })
-    });
-    loadProducts();
-}
+                    <button onclick="updateProduct('${item._id}', '${item.name}', ${item.price})" 
+                        class="w-9 h-9
