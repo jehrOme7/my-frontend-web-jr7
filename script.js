@@ -104,4 +104,81 @@ async function loadProducts() {
                 </div>
                 <div class="flex gap-1 pl-2">
                     <button onclick="updateProduct('${item._id}', '${item.name}', ${item.price})" 
-                        class="w-9 h-9
+                        class="w-9 h-9 rounded-full text-gray-400 hover:bg-amber-50 hover:text-amber-600 flex items-center justify-center transition">
+                        <i class="fa-solid fa-pen text-xs"></i>
+                    </button>
+                    <button onclick="deleteProduct('${item._id}')" 
+                        class="w-9 h-9 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error(error);
+        loader.innerHTML = '<p class="text-red-500 text-sm">เชื่อมต่อ Server ไม่ได้</p>';
+    }
+}
+
+// 4. เพิ่มสินค้า (POST)
+async function addProduct() {
+    const selector = document.getElementById('menu-selector');
+    if (!selector.value) {
+        // เขย่า Dropdown เตือน
+        selector.classList.add('ring-2', 'ring-red-400');
+        setTimeout(() => selector.classList.remove('ring-2', 'ring-red-400'), 500);
+        return;
+    }
+
+    const selectedItem = JSON.parse(selector.value);
+    const btn = document.querySelector('button[onclick="addProduct()"]');
+    
+    // เปลี่ยนปุ่มเป็น Loading
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+    btn.disabled = true;
+
+    try {
+        await fetch(`${BASE_URL}/api/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: selectedItem.name,
+                price: selectedItem.price
+            })
+        });
+        
+        loadProducts(); // โหลดใหม่
+        selector.value = "";
+        document.getElementById('price-display').textContent = "0 ฿";
+
+    } catch (error) {
+        alert("เกิดข้อผิดพลาด");
+    } finally {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    }
+}
+
+// 5. ลบสินค้า (DELETE)
+async function deleteProduct(id) {
+    if(!confirm("ลบรายการนี้?")) return;
+    
+    await fetch(`${BASE_URL}/api/products/${id}`, { method: 'DELETE' });
+    loadProducts();
+}
+
+// 6. แก้ไขสินค้า (PUT)
+async function updateProduct(id, oldName, oldPrice) {
+    const newPrice = prompt(`แก้ไขราคา ${oldName}:`, oldPrice);
+    if (newPrice === null || newPrice === "") return;
+
+    await fetch(`${BASE_URL}/api/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: oldName, price: parseInt(newPrice) })
+    });
+    loadProducts();
+}

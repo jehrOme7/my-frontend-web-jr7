@@ -100,4 +100,27 @@
                     <h3 class="text-gray-800 font-bold text-lg flex items-center gap-2">
                         <i class="fa-solid fa-list-ul text-amber-500"></i> รายการล่าสุด
                     </h3>
-                    <button onclick="
+                    <button onclick="loadProducts()" class="text-gray-400 hover:text-amber-500 transition bg-white p-2 rounded-lg shadow-sm border border-gray-100">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="hidden py-12 text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-amber-500"></div>
+                    <p class="text-gray-400 text-sm mt-3">กำลังโหลด...</p>
+                </div>
+
+                <!-- Grid รายการสินค้า: มือถือ 1 แถว / คอมพิวเตอร์ 2 แถว -->
+                <ul id="product-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-20">
+                    <!-- JS จะมาสร้างรายการตรงนี้ -->
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- เชื่อมต่อไฟล์ JS ที่นี่ -->
+    <script src="script.js"></script>
+</body>
+</html>
